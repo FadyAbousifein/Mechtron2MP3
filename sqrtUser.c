@@ -40,13 +40,16 @@ double sqrtUser(double number, int n) {
         
         x_n_plus_one = x_n - f_x/f_prime_x; // newtons method -> xn+1 = xn - f(xn)/f'(xn)
         
-        // checks if we have enough accurate decimals, notice that we check two condictions
-        // this is because the tolerance is actually defined as the |Xn-Xn+1| 
-        if ((x_n - x_n_plus_one) < tolerance || (x_n_plus_one - x_n) < tolerance) {
-            break; // if we have enough accurate decimals, newton's method no longer is needed
+        // checks if we have enough accurate decimals, notice that we check two conditions 
+        // this is because the current  tolerance is actually defined as the |Xn-Xn+1| 
+        if ((x_n - x_n_plus_one) > tolerance || (x_n_plus_one - x_n) > tolerance) {
+            x_n = x_n_plus_one; // new iteration becomes our new "initial guess" if we still dont have enough accurate decimals       
+        }
+        else {
+            break; // if we do have enough accurate decimals then newton's method is no longer needed
         }
         
-        x_n = x_n_plus_one; // new iteration becomes our new "initial guess" 
+       
 
     } while(1); 
 
