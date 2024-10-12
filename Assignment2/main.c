@@ -2,7 +2,6 @@
 #include <stdio.h> 
 #include <string.h> 
 #include "mySort.c" 
-#include "mySort.h"
 // Utility functions
 void printArray(int arr[], int n);
 
@@ -21,13 +20,27 @@ int main() {
     bubbleSort(testArr, n);
     printf("Bubble sorted array: ");
     printArray(testArr, n);
+ 
+
+    // Insertion Sort
     insertionSort(testArr, n);
     printf("Insertion sorted array: ");
     printArray(testArr, n);
+
+    // Merge Sort
     mergeSort(testArr, 0, n-1);
     printf("Merge sorted array: ");
     printArray(testArr, n);
 
+    // Heap Sort 
+    heapSort(testArr, n); 
+    printf("Heap sorted array: "); 
+    printArray(testArr, n); 
+
+    // Counting Sort 
+    countingSort(testArr, n); 
+    printf("Counting sorted array: "); 
+    printArray(testArr, n); 
 
     // CODE: do the same test cases for Insertion Sort, Merge Sort, Heap Sort, Counting Sort
     // You will submit main.c, and your project will be marked based on main.c as well
