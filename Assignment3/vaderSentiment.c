@@ -1,6 +1,4 @@
 #include "utility.h"
-#include <cstring>
-#include <ctype.h>
 #include <string.h>
 
 WordData * readData(char * fileName) {
@@ -141,11 +139,38 @@ float sentimentScore(WordData * data, char * sentence) {
         if (wordData.word[0] != '\0') {
             sentimentalWords++; 
             scores[i] = wordData.value1; 
-        }
+        
 
         // if the word is all capital, it's score will be multiplied by the CAPS factor 
         if (allCaps) {
             scores[i] *= CAPS; 
+        }
+
+        // view the previous word in the sentence and determine whether it affects the sentiment score
+        if (i > 0) {
+            // check for positive intesifiers 
+            for (int j = 0; j< POS_INT_SIZE; j++) {
+                if (strcmp(splitSent[i - 1], posInt[j]) == 0) {
+                    scores[i] += scores[i] * INTENSIFIER; 
+                }
+            }
+            // check for negative intensifiers
+            for (int j = 0; j< NEG_INT_SIZE; j++) {
+                if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
+                    scores[i] -= scores[i] * INTENSIFIER; 
+                }
+            }
+            
+            // check for negations 
+            for (int j = 0; j< NEG_INT_SIZE; j++) {
+                if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
+                    scores[i] *= NEGATION; 
+                }
+            }
+        }
+        } 
+        if (scores[i] > 0) {
+            scores[i] += exclamation * EXCLAMATION; 
         }
     }
 }

@@ -6,7 +6,7 @@
 #define MAX_STRING_LENGTH 100 
 
 #define INTENSIFIER 0.293 // boost values  
-#define EXCLAMATIO 0.292 
+#define EXCLAMATION 0.292 
 #define CAPS 1.5 
 #define NEGATION -0.5
 
