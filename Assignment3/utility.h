@@ -10,14 +10,6 @@
 #define CAPS 1.5 
 #define NEGATION -0.5
 
-// necessary header files 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <stdbool.h>
-#include <math.h>
-
 // defining the WordData Struct 
 typedef struct {
     char word[MAX_STRING_LENGTH];

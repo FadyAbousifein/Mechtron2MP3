@@ -1,4 +1,10 @@
 #include "utility.h"
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 WordData * readFile(char * fileName) {
     FILE * file = fopen(fileName, "r"); // open file in read mode
@@ -22,23 +28,21 @@ WordData * readFile(char * fileName) {
     // reading data from file 
     int i = 0; 
     while (true) {
-        // create temp pointer and resize memory for each new WordData item 
-        WordData * temp = realloc(data, (i+1) * sizeof(WordData)); 
         
+        // reallocate memort for new item 
+        data = realloc(data, (i+1) * sizeof(WordData)); 
+
         // handling potential error while allocating memory
-        if (temp  == NULL) {
+        if (data  == NULL) {
             printf("Error occured while allocating memmory\n"); 
+            free(data); 
             fclose(file); 
             return NULL; 
         }
-
-        data = temp; // only set data = temp when memory allocation for sure worked 
+        
+        // read a string and two float values 
+        fscanf(file, "%s %f %f", &data[i].word, &data[i].value1, &data[i].value2);
        
-        // read exactly three values (string, float, float) break otherwise 
-        if (fscanf(file, "%s %f %f", data[i].word, &data[i].value1, &data[i].value2) != 3) {
-            break; 
-        }
-
         // handle end of file 
         if (feof(file)) {
             data[i].word[0] = '\0'; // assign word as null character 
@@ -47,10 +51,8 @@ WordData * readFile(char * fileName) {
         
         // read the array 
         char line[2000]; 
-        if (fgets(line, sizeof(line), file) == NULL) {
-            break; 
-        }
-        
+        fgets(line, 2000, file); 
+
         char * tok = strtok(line, "[], \n\t\v\f\r"); // tokenize the array for integers 
         
         // store each tokenized integer into the integer array element of our struct 
@@ -58,7 +60,7 @@ WordData * readFile(char * fileName) {
             data[i].intArray[j] = atoi(tok); 
             tok = strtok(NULL, "[] \n\t\v\f\r"); // get next token 
         }
-        
+       
         // next word 
         i++; 
     }
@@ -69,7 +71,7 @@ WordData * readFile(char * fileName) {
 }
 
 // find the data of a word 
-WordData findData(WordData * data, const char * word) {
+WordData findData(WordData * data, char * word) {
     // iterate through elements in data 
     for (int i = 0; data[i].word[0] != '\0'; i++) {
         // if the word matches, then return it's data

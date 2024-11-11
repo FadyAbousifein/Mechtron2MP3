@@ -1,5 +1,4 @@
-#include "utility.h"
-
+#include "vaderSentiment.c"
 int main() {
     WordData * data = readFile("vader_lexicon.txt"); 
     char * sentence = "VADER is smart, handsome, and funny."; 
