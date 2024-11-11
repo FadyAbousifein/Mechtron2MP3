@@ -29,7 +29,7 @@ typedef struct {
 // function prototypes 
 WordData * readFile(char * fileName); 
 float sentimentScore(WordData * data, char * setence); 
-WordData getData(WordData * data, char * word); 
+WordData findData(WordData * data, char * word); 
 
 // positive intesifiers 
 #define POS_INT_SIZE 11 

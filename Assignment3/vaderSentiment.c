@@ -1,7 +1,6 @@
 #include "utility.h"
-#include <string.h>
 
-WordData * readData(char * fileName) {
+WordData * readFile(char * fileName) {
     FILE * file = fopen(fileName, "r"); // open file in read mode
 
     // handling potential error while opening file 
@@ -167,9 +166,29 @@ float sentimentScore(WordData *data, char *sentence) {
                     }
                 }
             }
-        } 
-        if (scores[i] > 0) {
-            scores[i] += exclamation * EXCLAMATION; 
-        }
+         
+            // exclamation will amplify a positive score, and reduce an already negative score, capped at 3
+            if (scores[i] > 0) {
+                scores[i] += exclamation * EXCLAMATION; 
+            } else {
+                scores[i] -= exclamation * EXCLAMATION; 
+            }
+        
+            // current sum of sentiment scores 
+            sumOfSentiment += scores[i]; 
+        }   
+    
+        // move to the next word in the setnence
+        tok = strtok(NULL, " \n\t\v\f\r,.?"); 
+        i++; 
     }
+    // print words and their scores 
+    for (int j = 0; j < i; j++) {
+        printf("Word: %s Score: %f\n", splitSent[j], scores[j]);
+        tok = strtok(NULL, " \n\t\v\f\r,.?"); 
+    }
+
+    // calculate compound score 
+    float compound = sumOfSentiment /sqrt(pow(sumOfSentiment, 2) + 15); 
+    return compound;
 }
