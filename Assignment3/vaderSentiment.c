@@ -104,105 +104,110 @@ float sentimentScore(WordData *data, char *sentence) {
     strcpy(copySent, sentence); 
     char *tok = strtok(copySent, " \n\t\v\f\r,.?"); 
 
-    // process each token  
-    while (tok != NULL) {
-        bool allCaps = true; // will store whether a token is all caps or not
-        int exclamation = 0;  // will store the number of exclamation marks in a token
+    // Loop through the tokens
+    for (; tok != NULL; i++) {
+        bool allCaps = true;    // will store whether a token is all caps or not
+        int exclamation = 0;    // will store the number of exclamation marks in a token
 
-        // initialize a character array to store tokens in lowercase and copy token into it 
-        char unCapsTok[MAX_STRING_LENGTH]; 
-        strcpy(unCapsTok, tok); 
+        // initialize a character array to store tokens in lowercase and copy token into it
+        char unCapsTok[MAX_STRING_LENGTH];
+        strcpy(unCapsTok, tok);
 
-        // iterate through characters in unCapsTok 
+        // iterate through characters in unCapsTok
         for (int j = 0; unCapsTok[j] != '\0'; j++) {
-            // check if word is all caps if not alter allCaps boolean to false 
-            if (islower(unCapsTok[j])) {
-                allCaps = false; 
+            // check if word is all caps if not alter allCaps boolean to false
+            if (islower(unCapsTok[j]) && unCapsTok[j] != '!') {
+                allCaps = false;
             }
 
-            unCapsTok[j] = tolower(unCapsTok[j]); // unCaps all characters in the token 
-            
+            unCapsTok[j] = tolower(unCapsTok[j]); // unCaps all characters in the token
+
             // check for exclamation marks if found increment exclamation
             if (unCapsTok[j] == '!') {
-                exclamation++; 
-                unCapsTok[j] = '\0'; // add a null character in place 
+                exclamation++;
+                unCapsTok[j] = '\0'; // add a null character in place
 
-                // max exclamation mark significance is capped at 3 
+                // max exclamation mark significance is capped at 3
                 if (exclamation > 3) {
-                    exclamation = 3; 
+                    exclamation = 3;
                 }
             }
         }
 
-        // copy token after being processed into splitSent 
-        strcpy(splitSent[i], unCapsTok); 
+        // copy token after being processed into splitSent
+        strcpy(splitSent[i], unCapsTok);
 
-        WordData wordData = findData(data, unCapsTok); // attempt to find data of the word 
+        WordData wordData = findData(data, unCapsTok); // attempt to find data of the word
 
-        // check if word is found in the data, if so then it has sentiment and thus contributes to the score 
+        // check if word is found in the data, if so then it has sentiment and thus contributes to the score
         if (wordData.word[0] != '\0') {
-            sentimentalWords++; 
-            scores[i] = wordData.value1; 
-        
+            sentimentalWords++;
+            scores[i] = wordData.value1;
 
-            // if the word is all capital, it's score will be multiplied by the CAPS factor 
+            // if the word is all capital, its score will be multiplied by the CAPS factor
             if (allCaps) {
-                scores[i] *= CAPS; 
+                scores[i] *= CAPS;
             }
-            
-            // intesifier effect on score
+
+            // intensifier effect on score
             if (intesifier != 0) {
-                scores[i] += intesifier * scores[i]; 
+                scores[i] += intesifier * scores[i];
             }
-            
-            // negation effect on score 
+
+            // negation effect on score
             if (negation != 0) {
-                scores[i] *= negation; 
+                scores[i] *= negation;
             }
 
             // exclamation will amplify a positive score, and reduce an already negative score, capped at 3
             if (scores[i] > 0) {
-                scores[i] += exclamation * EXCLAMATION; 
+                scores[i] += exclamation * EXCLAMATION;
             } else {
-                scores[i] -= exclamation * EXCLAMATION; 
+                scores[i] -= exclamation * EXCLAMATION;
             }
-        
-            // current sum of sentiment scores 
-            sumOfSentiment += scores[i]; 
-        } 
 
-        // resent intensifer 
-        intesifier = 0; 
+            // current sum of sentiment scores
+            sumOfSentiment += scores[i];
+        }
 
-        // check for positive intesifiers 
-        for (int j = 0; j< POS_INT_SIZE; j++) {
-            if (strcmp(splitSent[i - 1], posInt[j]) == 0) {
-                intesifier = INTENSIFIER; 
+        // reset intensifier
+        intesifier = 0;
+
+        // check for positive intensifiers
+        for (int j = 0; j < POS_INT_SIZE; j++) {
+            if (strcmp(splitSent[i], posInt[j]) == 0) {
+                intesifier = INTENSIFIER;
             }
         }
-                
+
         // check for negative intensifiers
-        for (int j = 0; j< NEG_INT_SIZE; j++) {
-            if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
-                intesifier = -INTENSIFIER; 
-            }
-        }
-        // check for negations 
-        for (int j = 0; j< NEG_INT_SIZE; j++) {
-            if (strcmp(splitSent[i - 1], negations[j]) == 0) {
-                negation = NEGATION; 
+        for (int j = 0; j < NEG_INT_SIZE; j++) {
+            if (strcmp(splitSent[i], negInt[j]) == 0) {
+                intesifier = -INTENSIFIER;
             }
         }
 
-        // handle capatilized negation  
-        if (allCaps && negation != 0) {
-            negation *= CAPS; 
+        // handle capitalized intensifier
+        if (allCaps && intesifier != 0) {
+            intesifier *= CAPS;
         }
-         
-    
-        // move to the next word in the setnence
-        tok = strtok(NULL, " \n\t\v\f\r,.?"); 
+
+        // check for negations
+        for (int j = 0; j < NEGATION; j++) {
+            if (strcmp(splitSent[i], negations[j]) == 0) {
+                negation = NEGATION;
+            }
+        }
+
+        // handle capitalized negation
+        if (allCaps && negation != 0) {
+            negation *= CAPS;
+        }
+
+        // move to the next word in the sentence
+        tok = strtok(NULL, " \n\t\v\f\r,.?");
     }
+
     // print words and their scores 
     // for (int j = 0; j < i; j++) {
         // printf("Word: %s Score: %f\n", splitSent[j], scores[j]);
