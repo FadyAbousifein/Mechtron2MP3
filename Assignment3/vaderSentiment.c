@@ -115,7 +115,7 @@ float sentimentScore(WordData *data, char *sentence) {
 
         // iterate through characters in unCapsTok
         for (int j = 0; unCapsTok[j] != '\0'; j++) {
-            // check if word is all caps if not alter allCaps boolean to false
+            // check if word is all caps if not alter allCaps boolean to false ! must not be present to ensure unecessary intesficaiton does not occur
             if (islower(unCapsTok[j]) && unCapsTok[j] != '!') {
                 allCaps = false;
             }
@@ -193,7 +193,7 @@ float sentimentScore(WordData *data, char *sentence) {
         }
 
         // check for negations
-        for (int j = 0; j < NEGATION; j++) {
+        for (int j = 0; j < NEGAT_SIZE; j++) {
             if (strcmp(splitSent[i], negations[j]) == 0) {
                 negation = NEGATION;
             }
