@@ -97,6 +97,9 @@ float sentimentScore(WordData *data, char *sentence) {
     char splitSent[MAX_STRING_LENGTH][MAX_STRING_LENGTH]; // stores the sentence's words individually 
     char copySent[MAX_STRING_LENGTH]; // copy of the sentence 
     
+    float intesifier = 0.0; // current intesifer value 
+    float negation = 0.0; // current negation value 
+
     // copy sentence into copySent and tokenize it removing all punctuation without sentiment effecting value 
     strcpy(copySent, sentence); 
     char *tok = strtok(copySent, " \n\t\v\f\r,.?"); 
@@ -146,29 +149,17 @@ float sentimentScore(WordData *data, char *sentence) {
             if (allCaps) {
                 scores[i] *= CAPS; 
             }
-
-            // view the previous word in the sentence and determine whether it affects the sentiment score
-            if (i > 0) {
-                // check for positive intesifiers 
-                for (int j = 0; j< POS_INT_SIZE; j++) {
-                    if (strcmp(splitSent[i - 1], posInt[j]) == 0) {
-                        scores[i] += scores[i] * INTENSIFIER; 
-                    }
-                }
-                // check for negative intensifiers
-                for (int j = 0; j< NEG_INT_SIZE; j++) {
-                    if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
-                        scores[i] -= scores[i] * INTENSIFIER; 
-                    }
-                }
-                // check for negations 
-                for (int j = 0; j< NEG_INT_SIZE; j++) {
-                    if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
-                        scores[i] *= NEGATION; 
-                    }
-                }
+            
+            // intesifier effect on score
+            if (intesifier != 0) {
+                scores[i] += intesifier * scores[i]; 
             }
-         
+            
+            // negation effect on score 
+            if (negation != 0) {
+                scores[i] *= negation; 
+            }
+
             // exclamation will amplify a positive score, and reduce an already negative score, capped at 3
             if (scores[i] > 0) {
                 scores[i] += exclamation * EXCLAMATION; 
@@ -178,19 +169,46 @@ float sentimentScore(WordData *data, char *sentence) {
         
             // current sum of sentiment scores 
             sumOfSentiment += scores[i]; 
-        }   
+        } 
+
+        // resent intensifer 
+        intesifier = 0; 
+
+        // check for positive intesifiers 
+        for (int j = 0; j< POS_INT_SIZE; j++) {
+            if (strcmp(splitSent[i - 1], posInt[j]) == 0) {
+                intesifier = INTENSIFIER; 
+            }
+        }
+                
+        // check for negative intensifiers
+        for (int j = 0; j< NEG_INT_SIZE; j++) {
+            if (strcmp(splitSent[i - 1], negInt[j]) == 0) {
+                intesifier = -INTENSIFIER; 
+            }
+        }
+        // check for negations 
+        for (int j = 0; j< NEG_INT_SIZE; j++) {
+            if (strcmp(splitSent[i - 1], negations[j]) == 0) {
+                negation = NEGATION; 
+            }
+        }
+
+        // handle capatilized negation  
+        if (allCaps && negation != 0) {
+            negation *= CAPS; 
+        }
+         
     
         // move to the next word in the setnence
         tok = strtok(NULL, " \n\t\v\f\r,.?"); 
-        i++; 
     }
     // print words and their scores 
-    for (int j = 0; j < i; j++) {
-        printf("Word: %s Score: %f\n", splitSent[j], scores[j]);
-        tok = strtok(NULL, " \n\t\v\f\r,.?"); 
-    }
+    // for (int j = 0; j < i; j++) {
+        // printf("Word: %s Score: %f\n", splitSent[j], scores[j]);
+        // tok = strtok(NULL, " \n\t\v\f\r,.?"); 
+    // }
 
-    // calculate compound score 
-    float compound = sumOfSentiment /sqrt(pow(sumOfSentiment, 2) + 15); 
+    float compound = sumOfSentiment / sqrt(pow(sumOfSentiment, 2) + 15); 
     return compound;
 }
