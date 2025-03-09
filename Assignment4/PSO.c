@@ -27,7 +27,7 @@ void initializer(Particle * particles, int NUM_PARTICLES, int NUM_VARIABLES, Bou
         for (int j = 0; j < NUM_VARIABLES; j++) {
             particle.position[j] = random_double(bounds[j].lowerBound, bounds[j].upperBound); 
             particle.velocity[j] = 0.0; 
-            // the bestPosition will be initialized in PSO 
+            // particles[i].bestPosition[j] = particles[i].position[j]; 
         }
 
         // retrieve particles current position and initialize the best value as the current value
